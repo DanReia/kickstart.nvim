@@ -102,7 +102,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 -- You can also add relative line numbers, for help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -154,6 +154,13 @@ vim.opt.scrolloff = 10
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
+-- Core Keymaps
+vim.keymap.set('i', 'jj', '<Esc>')
+vim.keymap.set('n', '<leader>w', '<cmd>w<cr>')
+vim.keymap.set({ 'n', 'v' }, 'H', '^')
+vim.keymap.set({ 'n', 'v' }, 'L', '$')
+--vim.keymap.set('n', '<leader><leader>', '<C-^>')
+
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
@@ -170,8 +177,11 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 --
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-
+vim.keymap.set('t', 'jj', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+vim.keymap.set('t', '<C-h>', '[[<Cmd>wincmd h<CR>]]', { desc = 'Exit terminal mode left' })
+vim.keymap.set('t', '<C-j>', '[[<Cmd>wincmd j<CR>]]', { desc = 'Exit terminal mode down' })
+vim.keymap.set('t', '<C-k>', '[[<Cmd>wincmd k<CR>]]', { desc = 'Exit terminal mode up' })
+vim.keymap.set('t', '<C-l>', '[[<Cmd>wincmd l<CR>]]', { desc = 'Exit terminal mode right' })
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -222,6 +232,7 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true, opts = {} },
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -538,8 +549,8 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
+        pyright = {},
+        rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -599,15 +610,16 @@ require('lazy').setup({
   { -- Autoformat
     'stevearc/conform.nvim',
     opts = {
-      notify_on_error = false,
+      notify_on_error = true,
       format_on_save = {
-        timeout_ms = 500,
+        timeout_ms = 20000,
         lsp_fallback = true,
       },
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
+        python = { 'isort', 'ruff_fix', 'ruff_format' },
+        rust = { 'rustfmt' },
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
@@ -720,7 +732,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'gruvbox'
 
       -- You can configure highlights by doing something like
       vim.cmd.hi 'Comment gui=none'
@@ -728,7 +740,7 @@ require('lazy').setup({
   },
 
   -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = true } },
 
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
